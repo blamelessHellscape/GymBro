@@ -17,13 +17,20 @@ class Db_Helper:
 
     def get_data(self,user, exercise):
         query_string = f'''select * from exercises where user="{user}" and exercise="{exercise}"'''
-        print(query_string)
         results = self.run_query(query_string)
-        print(type(results),results)
+        print('DB: retrived:',results)
         df = pd.DataFrame(results, columns=['id','date','max_weight','user','exercise'])
-        print(df.head())
         return df
 
     def insert_data(self,user, exercise, max_weight):
-        self.run_query(f'''insert into exercises(date, max_weight,user,exercise) values ("{datetime.datetime.now().date()}",{max_weight}, "{user}", "{exercise}")''')
+        res = self.run_query(f'''insert into exercises(date, max_weight,user,exercise) values ("{datetime.datetime.now().date()}",{max_weight}, "{user}", "{exercise}")''')
+        self.db.commit()
         print(f'inserted values {user} {exercise} {max_weight}' )
+        print('DB: INSERT RESULT:',res)
+        return res
+    
+    def remove_last_row(self):
+        query = '''delete from exercises where id= (select max(id) from exercises)'''
+        res = self.run_query(query)
+        self.db.commit()
+        return res
