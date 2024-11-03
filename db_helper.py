@@ -25,8 +25,7 @@ class Db_Helper:
     def insert_data(self,user, exercise, max_weight):
         res = self.run_query(f'''insert into exercises(date, max_weight,user,exercise) values ("{datetime.datetime.now().date()}",{max_weight}, "{user}", "{exercise}")''')
         self.db.commit()
-        print(f'inserted values {user} {exercise} {max_weight}' )
-        print('DB: INSERT RESULT:',res)
+        print(f'DB: inserted values {user} {exercise} {max_weight}' )
         return res
     
     def remove_last_row(self):
@@ -34,3 +33,7 @@ class Db_Helper:
         res = self.run_query(query)
         self.db.commit()
         return res
+    
+#https://dash.plotly.com/datatable/editable#adding-or-removing-rows
+#Table: exercise:: row-id, reps, weight, user, exercise
+#Table: pr:: date, max_weight, exercise, user
