@@ -1,6 +1,5 @@
 from dash import Dash, html, dcc, callback, Output, Input, State
 import dash_bootstrap_components as dbc
-import pandas as pd
 import plotly.express as px
 import db_helper
 
@@ -13,7 +12,7 @@ app = Dash()
 app.config.external_stylesheets = [dbc.themes.CYBORG]
 
 app.layout = [
-    html.H1(children='The Gain Plan', style={'textAlign': 'center'}),
+    html.H1(children='GymBro', style={'textAlign': 'center'}),
     html.Hr(),
     dcc.RadioItems(options=OPTIONS,
                    value=OPTIONS[0], id='user_chooser', inline=True),
@@ -48,10 +47,10 @@ app.layout = [
     Input('undo_btn', 'n_clicks')
 )
 def update_user(user_value, exercise_value, n, new_max, n_undo):
-    #print('USER:', user_value)
-    #print('EXERCISE', exercise_value)
+    print('USER:', user_value)
+    print('EXERCISE', exercise_value)
     if n and new_max:
-        #print('entered', new_max)
+        print('entered', new_max)
         status = dbh.insert_data(user_value, exercise_value, new_max)
     if n_undo:
         dbh.remove_last_row()
