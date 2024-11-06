@@ -7,7 +7,7 @@ class Db_Helper:
     def __init__(self):
         print('db init')
         self.db = sqlite3.connect('gains.db',  check_same_thread=False)
-        self.run_query('''create table if not exists exercise_table(id INTEGER PRIMARY KEY, row_id INTEGER, weight INTEGER, user TEXT, exercise TEXT)''')
+        self.run_query('''create table if not exists exercise_table(id INTEGER PRIMARY KEY, row_id INTEGER, reps INTEGER, weight INTEGER, user TEXT, exercise TEXT)''')
         self.run_query('''create table if not exists pr_table(id INTEGER PRIMARY KEY, date TEXT, max_weight INTEGER, user TEXT, exercise TEXT)''')
         self.db.commit()
     
@@ -37,6 +37,21 @@ class Db_Helper:
     
     def get_exercise_data(self, user, exercise):
         query_string = f'''select * from exercise_table where user="{user}" and exercise="{exercise} order by row_id asc"'''
+        res = self.run_query(query_string)
+        print('DB: retrieved', res)
+        # df = pd.DataFrame(results, columns=['id','date','max_weight','user','exercise'])
+        return res
+    
+    def insert_exercise_data(self,reps, weight, row_id, user, exercise): #TODO: this is broken lol, nothing gets inserted.
+        id = hash( str(row_id) + user + exercise)
+        query = f'''insert into exercise_table (id, reps, weight, row_id, user, exercise) 
+        values({id}, {reps}, {weight}, {row_id}, "{user}", "{exercise}") 
+        on conflict(id) 
+        do update set reps=excluded.reps, weight=excluded.weight '''
+        print(query)
+        res = self.run_query(query)
+        self.db.commit()
+        return res
     
 #https://dash.plotly.com/datatable/editable#adding-or-removing-rows
 #Table: exercise:: row-id, reps, weight, user, exercise
