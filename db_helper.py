@@ -29,29 +29,43 @@ class Db_Helper:
         print(f'DB: inserted values {user} {exercise} {max_weight}' )
         return res
     
-    def remove_last_pr_row(self):
-        query = '''delete from pr_table where id= (select max(id) from exercises)'''
-        res = self.run_query(query)
-        self.db.commit()
-        return res
+    # def remove_last_pr_row(self):
+    #     query = '''delete from pr_table where id= (select max(id) from exercises)'''
+    #     res = self.run_query(query)
+    #     self.db.commit()
+    #     return res
     
     def get_exercise_data(self, user, exercise):
-        query_string = f'''select * from exercise_table where user="{user}" and exercise="{exercise} order by row_id asc"'''
+        query_string = f'''select * from exercise_table where user="{user}" and exercise="{exercise}" order by row_id asc'''
+        # print(query_string)
         res = self.run_query(query_string)
-        print('DB: retrieved', res)
-        # df = pd.DataFrame(results, columns=['id','date','max_weight','user','exercise'])
-        return res
+        print(res)
+        ret = [{'reps_col': i[2], 'weight_col':i[3]} for i in res]
+        print(ret)
+        return ret
     
-    def insert_exercise_data(self,reps, weight, row_id, user, exercise): #TODO: this is broken lol, nothing gets inserted.
-        id = hash( str(row_id) + user + exercise)
-        query = f'''insert into exercise_table (id, reps, weight, row_id, user, exercise) 
-        values({id}, {reps}, {weight}, {row_id}, "{user}", "{exercise}") 
-        on conflict(id) 
-        do update set reps=excluded.reps, weight=excluded.weight '''
-        print(query)
-        res = self.run_query(query)
+    def insert_exercise_data(self,table_data, user, exercise): #TODO: this is broken lol, nothing gets inserted.
+        #delete all where user and exercise
+        query_string = f'''delete from exercise_table where user="{user}" and exercise="{exercise}"'''
+        self.run_query(query_string)
+        #insert 
+        for row in table_data:
+            print('ROW:', row) 
+            query_string = f'''insert into exercise_table(reps,weight,row_id,user,exercise) values(
+                {row['reps_col']}, {row['weight_col']},{table_data.index(row)}, "{user}", "{exercise}")'''
+            print(query_string)
+            self.run_query(query_string)
         self.db.commit()
-        return res
+        
+        # id = hash( str(row_id) + user + exercise)
+        # query = f'''insert into exercise_table (id, reps, weight, row_id, user, exercise) 
+        # values({id}, {reps}, {weight}, {row_id}, "{user}", "{exercise}") 
+        # on conflict(id) 
+        # do update set reps=excluded.reps, weight=excluded.weight '''
+        # print(query)
+        # res = self.run_query(query)
+        # self.db.commit()
+        # return res
     
 #https://dash.plotly.com/datatable/editable#adding-or-removing-rows
 #Table: exercise:: row-id, reps, weight, user, exercise
