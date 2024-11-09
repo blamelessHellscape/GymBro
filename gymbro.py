@@ -63,17 +63,25 @@ def update_user(user_value, exercise_value, save_clicks, add_row, table_data):
     # print('USER:', user_value)
     # print('EXERCISE', exercise_value)
     rows = get_table_data(USER, EXERCISE)
+
     # print('displaying rows', rows)
+    # print('table_data', table_data)
+    # print('interesection', [i for i in table_data if i not in rows])
+    # print('-----')
+    rows.extend([i for i in table_data if i not in rows])
     match trigger:
         case 'add_row_btn':
             rows.extend(INITIAL_DATA)
-            return update_graph(user_value, exercise_value), rows
+            # return update_graph(user_value, exercise_value), rows
         case 'save_data_btn':
-            # print('save:', table_data)
+            print('save:', table_data)
+            if table_data[-1]['reps_col'] == '': #bad if there are 2+ empty rows, too lazy to fix
+                del table_data[-1]
             dbh.insert_exercise_data(table_data, USER, EXERCISE)
-            return update_graph(user_value, exercise_value), table_data
-        case _:
-            return update_graph(user_value, exercise_value), rows
+            rows = get_table_data(USER, EXERCISE)
+            # return update_graph(user_value, exercise_value), rows
+        
+    return update_graph(user_value, exercise_value), rows
 
 
 def get_table_data(user, exercise):
