@@ -58,8 +58,9 @@ def update_user(user_value, exercise_value, save_clicks, add_row, table_data):
     # https://stackoverflow.com/questions/62119605/dash-how-to-callback-depending-on-which-button-is-being-clicked
     trigger = callback_context.triggered[0]['prop_id'].split('.')[0]
     # print('TRIGGER',trigger)
-    USER = user_value
-    EXERCISE = exercise_value
+    global USER
+    global EXERCISE
+    
     # print('USER:', user_value)
     # print('EXERCISE', exercise_value)
     rows = get_table_data(USER, EXERCISE)
@@ -70,16 +71,22 @@ def update_user(user_value, exercise_value, save_clicks, add_row, table_data):
     # print('-----')
     rows.extend([i for i in table_data if i not in rows])
     match trigger:
+        case 'user_chooser':
+            USER = user_value
+            rows = get_table_data(USER, EXERCISE)
+        case 'exercise_chooser':
+            EXERCISE = exercise_value
+            rows = get_table_data(USER, EXERCISE)
         case 'add_row_btn':
             rows.extend(INITIAL_DATA)
-            # return update_graph(user_value, exercise_value), rows
+            return update_graph(user_value, exercise_value), rows
         case 'save_data_btn':
-            print('save:', table_data)
+            # print('save:', table_data)
             if table_data[-1]['reps_col'] == '': #bad if there are 2+ empty rows, too lazy to fix
                 del table_data[-1]
             dbh.insert_exercise_data(table_data, USER, EXERCISE)
             rows = get_table_data(USER, EXERCISE)
-            # return update_graph(user_value, exercise_value), rows
+            return update_graph(user_value, exercise_value), rows
         
     return update_graph(user_value, exercise_value), rows
 
