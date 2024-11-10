@@ -29,8 +29,14 @@ class Db_Helper:
         return df
 
     def insert_pr_data(self, user, exercise, max_weight):
-        res = self.run_query(
-            f'''insert into pr_table(date, max_weight,user,exercise) values ("{datetime.datetime.now().date()}",{max_weight}, "{user}", "{exercise}")''')
+        date = datetime.datetime.now().date()
+        exists = self.run_query(f'''select * from pr_table where user="{user}" and exercise="{exercise}" and "{date}"''')
+        if exists:
+            # print('exists',exists)
+            return
+        query_string = f'''insert into pr_table(date, max_weight,user,exercise) values ("{date}",{max_weight}, "{user}", "{exercise}")'''
+        res = self.run_query(query_string)
+        print(query_string)
         self.db.commit()
         # print(f'DB: inserted values {user} {exercise} {max_weight}')
         return res
