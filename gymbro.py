@@ -82,8 +82,7 @@ def update_user(user_value, exercise_value, save_clicks, add_row, table_data):
             return update_graph(user_value, exercise_value), rows
         case 'save_data_btn':
             # print('save:', table_data)
-            if table_data[-1]['reps_col'] == '': #bad if there are 2+ empty rows, too lazy to fix
-                del table_data[-1]
+            table_data = [i for i in table_data if i['reps_col'] != '']
             dbh.insert_exercise_data(table_data, USER, EXERCISE)
             rows = get_table_data(USER, EXERCISE)
             return update_graph(user_value, exercise_value), rows

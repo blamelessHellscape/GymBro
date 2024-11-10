@@ -13,6 +13,9 @@ class Db_Helper:
             '''create table if not exists exercise_table(id INTEGER PRIMARY KEY, row_id INTEGER, reps INTEGER, weight INTEGER, user TEXT, exercise TEXT)''')
         self.run_query(
             '''create table if not exists pr_table(id INTEGER PRIMARY KEY, date TEXT, max_weight INTEGER, user TEXT, exercise TEXT)''')
+        self.run_query(
+            '''create table if not exists exercise_names_table(exercise_name TEXT PRIMARY KEY)'''
+        )
         self.db.commit()
 
     def run_query(self, query):
